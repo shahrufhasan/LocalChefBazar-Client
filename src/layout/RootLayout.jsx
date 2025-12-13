@@ -10,7 +10,9 @@ const RootLayout = () => {
       <div className="h-screen max-w-7xl mx-auto">
         <Outlet></Outlet>
       </div>
-      <Footer></Footer>
+      <div>
+        <Footer></Footer>
+      </div>
     </div>
   );
 };

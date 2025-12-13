@@ -1,6 +1,6 @@
 import React from "react";
-import Banner from "./Banner";
-import OrderingBanner from "./OrderingBanner";
+import Banner from "../../components/Home/Banner";
+import OrderingBanner from "../../components/Home/OrderingBanner";
 
 const Home = () => {
   return (

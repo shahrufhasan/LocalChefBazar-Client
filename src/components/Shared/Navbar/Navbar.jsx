@@ -1,8 +1,14 @@
 import React from "react";
 import logo from "../../../assets/logo.png";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
+import useAuth from "../../../hooks/useAuth";
+import { ImSpinner3 } from "react-icons/im";
 
 const Navbar = () => {
+  const { user, logOut } = useAuth();
+  const navigate = useNavigate();
+  const [loading, setLoading] = React.useState(false);
+
   const links = [
     { name: "Home", path: "/" },
     { name: "Meals", path: "/meals" },
@@ -28,6 +34,15 @@ const Navbar = () => {
         </Link>
       </li>
     ));
+
+  const handleLogout = async () => {
+    try {
+      await logOut();
+      navigate("/");
+    } catch (err) {
+      console.error("Logout failed", err);
+    }
+  };
 
   return (
     <div className="fixed top-0 left-0 w-full backdrop-blur-sm z-50">
@@ -57,23 +72,89 @@ const Navbar = () => {
               {renderLinks()}
             </ul>
           </div>
-          {/* Logo */}
+
           <img src={logo} className="w-12 md:w-fit" alt="Logo" />
         </div>
 
-        {/* Navbar Center */}
         <div className="navbar-center hidden lg:flex">
           <ul className="menu menu-horizontal px-1">{renderLinks()}</ul>
         </div>
 
-        {/* Navbar End */}
         <div className="navbar-end flex gap-2">
-          <Link to="/login" className="btn btn-outline btn-primary">
-            Login
-          </Link>
-          <Link to="/register" className="btn btn-outline">
-            Register
-          </Link>
+          {user ? (
+            <div className="relative group">
+              <div className="cursor-pointer">
+                <div className="avatar">
+                  <div className="w-10 rounded-full ring ring-primary ring-offset-base-100">
+                    <img
+                      src={user?.photoURL || "/default-avatar.png"}
+                      alt={user?.displayName || "User"}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className="
+                absolute right-0 top-12 w-48 bg-base-100 shadow-lg rounded-lg p-3 z-50
+                opacity-0 translate-y-2
+                group-hover:opacity-100 group-hover:translate-y-0
+                transition-all duration-300 ease-in-out flex flex-col
+              "
+              >
+                <span className="font-semibold mb-2 truncate">
+                  {user?.displayName || "User"}
+                </span>
+
+                <button
+                  className="btn btn-outline btn-primary flex items-center gap-2"
+                  onClick={() => {
+                    setLoading(true);
+                    setTimeout(async () => {
+                      await handleLogout();
+                      setLoading(false);
+                    }, 300);
+                  }}
+                >
+                  {loading ? (
+                    <ImSpinner3 className="animate-spin text-lg" />
+                  ) : (
+                    "Log Out"
+                  )}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <button
+                className="btn btn-outline btn-primary flex items-center gap-2"
+                onClick={() => {
+                  setLoading(true);
+                  setTimeout(() => navigate("/login"), 300);
+                }}
+              >
+                {loading ? (
+                  <ImSpinner3 className="animate-spin text-lg" />
+                ) : (
+                  "Login"
+                )}
+              </button>
+
+              <button
+                className="btn btn-outline flex items-center gap-2"
+                onClick={() => {
+                  setLoading(true);
+                  setTimeout(() => navigate("/register"), 300);
+                }}
+              >
+                {loading ? (
+                  <ImSpinner3 className="animate-spin text-lg" />
+                ) : (
+                  "Register"
+                )}
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>
