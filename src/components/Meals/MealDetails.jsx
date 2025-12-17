@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import axiosPublic from "../../hooks/useAxiosPublic";
 import useAuth from "../../hooks/useAuth";
 import Swal from "sweetalert2";
@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 const MealDetails = () => {
   const { id } = useParams(); // meal id
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [meal, setMeal] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState({
@@ -97,6 +98,15 @@ const MealDetails = () => {
     }
   };
 
+  // Handle Order Now
+  const handleOrderNow = () => {
+    if (!user) {
+      Swal.fire("Error", "You must be logged in to place an order", "error");
+      return;
+    }
+    navigate(`/order/${meal._id}`); // fix: match router path
+  };
+
   if (!meal) return <div className="text-center mt-10">Loading...</div>;
 
   return (
@@ -133,12 +143,14 @@ const MealDetails = () => {
               <strong>Chef’s Experience:</strong> {meal.chefExperience}
             </p>
 
-            <button
-              className="btn btn-secondary mt-4"
-              onClick={handleAddFavorite}
-            >
-              Add to Favorite
-            </button>
+            <div className="flex gap-3 mt-4">
+              <button className="btn btn-secondary" onClick={handleAddFavorite}>
+                Add to Favorite
+              </button>
+              <button className="btn btn-primary" onClick={handleOrderNow}>
+                Order Now
+              </button>
+            </div>
           </div>
         </div>
 
@@ -146,28 +158,31 @@ const MealDetails = () => {
         <div className="mt-8">
           <h3 className="text-2xl font-semibold mb-4">Reviews</h3>
           <div className="space-y-4 mb-6">
-            {reviews.map((r, idx) => (
-              <div
-                key={idx}
-                className="border rounded-lg p-4 flex gap-4 items-start"
-              >
-                <img
-                  src={r.reviewerImage}
-                  alt={r.reviewerName}
-                  className="w-12 h-12 rounded-full object-cover"
-                />
-                <div>
-                  <p className="font-semibold">
-                    {r.reviewerName} - {r.rating} ⭐
-                  </p>
-                  <p>{r.comment}</p>
-                  <p className="text-xs text-gray-500">
-                    {new Date(r.date).toLocaleString()}
-                  </p>
+            {reviews.length > 0 ? (
+              reviews.map((r, idx) => (
+                <div
+                  key={idx}
+                  className="border rounded-lg p-4 flex gap-4 items-start"
+                >
+                  <img
+                    src={r.reviewerImage}
+                    alt={r.reviewerName}
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                  <div>
+                    <p className="font-semibold">
+                      {r.reviewerName} - {r.rating} ⭐
+                    </p>
+                    <p>{r.comment}</p>
+                    <p className="text-xs text-gray-500">
+                      {new Date(r.date).toLocaleString()}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
-            {reviews.length === 0 && <p>No reviews yet.</p>}
+              ))
+            ) : (
+              <p>No reviews yet.</p>
+            )}
           </div>
 
           {/* Add Review Form */}
