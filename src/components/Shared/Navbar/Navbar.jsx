@@ -12,7 +12,7 @@ const Navbar = () => {
   const links = [
     { name: "Home", path: "/" },
     { name: "Meals", path: "/meals" },
-    { name: "Dashboard", path: "/dashboard" },
+    ...(user ? [{ name: "Dashboard", path: "/dashboard" }] : []),
   ];
 
   const location = useLocation();

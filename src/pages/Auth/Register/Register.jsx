@@ -1,18 +1,15 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useLocation, Link } from "react-router";
-import { ImSpinner3 } from "react-icons/im";
-import useAuth from "../../../hooks/useAuth";
-import useAxiosSecure from "../../../hooks/useAxiosSecure";
-import { imageUpload } from "../../../utilities";
 import Swal from "sweetalert2";
+import useAuth from "../../../hooks/useAuth";
+import axiosPublic from "../../../hooks/useAxiosPublic";
+import { imageUpload } from "../../../utilities";
 
 const Register = () => {
-  const { registerUser, updateUser, loading } = useAuth();
-  const axiosSecure = useAxiosSecure();
+  const { registerUser, updateUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state || "/";
 
   const {
     register,
@@ -23,35 +20,57 @@ const Register = () => {
 
   const onSubmit = async (data) => {
     try {
-      const { name, email, password, image } = data;
+      const { name, email, password, confirmPassword, address, image } = data;
+
+      if (password !== confirmPassword) {
+        Swal.fire({
+          position: "top-end",
+          icon: "error",
+          title: "Passwords do not match",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        return;
+      }
+
       const imageFile = image[0];
 
-      // Upload image
       const imageURL = await imageUpload(imageFile);
 
-      // Register user in Firebase
-      const result = await registerUser(email, password);
+      await registerUser(email, password);
 
-      // Update user profile correctly
-      await updateUser({ displayName: name, photoURL: imageURL });
-
-      const userInfo = { email, displayName: name, photoURL: imageURL };
-      await axiosSecure.post("/users", userInfo);
-
-      Swal.fire({
-        position: "top-end",
-        icon: "success",
-        title: "Registration Successfull",
-        showConfirmButton: false,
-        timer: 1500,
+      await updateUser({
+        displayName: name,
+        photoURL: imageURL,
       });
-      navigate(from, { replace: true });
-      console.log(result);
+
+      const userInfo = {
+        name,
+        email,
+        photoURL: imageURL,
+        address,
+        role: "user",
+        status: "active",
+      };
+
+      const res = await axiosPublic.post("/users", userInfo);
+
+      if (res.data.insertedId) {
+        Swal.fire({
+          position: "top-end",
+          icon: "success",
+          title: "Successfully Registered",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+
+        navigate(location.state || "/");
+      }
     } catch (err) {
       console.error("Registration Error:", err);
       Swal.fire({
         position: "top-end",
-        icon: "success",
+        icon: "error",
         title: "Registration Failed",
         showConfirmButton: false,
         timer: 1500,
@@ -60,134 +79,106 @@ const Register = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-base-200 font-Lora p-4">
-      <div className="w-full max-w-md p-8 rounded-2xl liquid-card shadow-lg">
-        <div className="text-center mb-6">
-          <h1 className="text-4xl font-bold text-primary mb-2">Register</h1>
-          <p className="text-accent">Create your account to get started</p>
-        </div>
+    <div className="min-h-screen flex items-center justify-center bg-base-200 px-4">
+      <div className="w-full max-w-md bg-base-100 rounded-2xl shadow-xl p-8">
+        <h2 className="text-3xl font-bold text-center text-primary mb-2">
+          Create Account
+        </h2>
+        <p className="text-center text-gray-500 mb-6">
+          Join and start your journey with LocalChefBazar
+        </p>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Name */}
           <div>
-            <label className="block mb-1 text-sm font-medium">Name</label>
             <input
-              type="text"
-              placeholder="Enter your name"
-              className="w-full px-4 py-2 rounded-lg border border-base-300 focus:border-secondary focus:outline-none bg-base-100 text-neutral"
-              {...register("name", {
-                required: "Name is required",
-                maxLength: { value: 20, message: "Name cannot be too long" },
-              })}
+              {...register("name", { required: true })}
+              placeholder="Full Name"
+              className="input input-bordered w-full"
             />
             {errors.name && (
-              <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
+              <p className="text-xs text-red-500 mt-1">Name is required</p>
+            )}
+          </div>
+
+          {/* Address */}
+          <div>
+            <input
+              {...register("address", { required: true })}
+              placeholder="Address"
+              className="input input-bordered w-full"
+            />
+            {errors.address && (
+              <p className="text-xs text-red-500 mt-1">Address is required</p>
             )}
           </div>
 
           {/* Profile Image */}
           <div>
-            <label className="block mb-1 text-sm font-medium">
-              Profile Image
-            </label>
             <input
               type="file"
-              accept="image/*"
-              className="block w-full text-sm text-neutral
-                file:mr-4 file:py-2 file:px-4
-                file:rounded-lg file:border-0
-                file:text-sm file:font-semibold
-                file:bg-base-300 file:text-primary
-                hover:file:bg-base-200
-                border border-dashed border-base-300 rounded-lg cursor-pointer
-                focus:outline-secondary py-2"
-              {...register("image", { required: "Profile image is required" })}
+              {...register("image", { required: true })}
+              className="file-input file-input-bordered w-full"
             />
             {errors.image && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.image.message}
+              <p className="text-xs text-red-500 mt-1">
+                Profile image is required
               </p>
             )}
           </div>
 
           {/* Email */}
           <div>
-            <label className="block mb-1 text-sm font-medium">Email</label>
             <input
               type="email"
-              placeholder="Enter your email"
-              className="w-full px-4 py-2 rounded-lg border border-base-300 focus:border-secondary focus:outline-none bg-base-100 text-neutral"
-              {...register("email", {
-                required: "Email is required",
-                pattern: {
-                  value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                  message: "Please enter a valid email address",
-                },
-              })}
+              {...register("email", { required: true })}
+              placeholder="Email"
+              className="input input-bordered w-full"
             />
             {errors.email && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.email.message}
-              </p>
+              <p className="text-xs text-red-500 mt-1">Email is required</p>
             )}
           </div>
 
           {/* Password */}
           <div>
-            <label className="block mb-1 text-sm font-medium">Password</label>
             <input
               type="password"
-              placeholder="Enter password"
-              className="w-full px-4 py-2 rounded-lg border border-base-300 focus:border-secondary focus:outline-none bg-base-100 text-neutral"
-              {...register("password", {
-                required: "Password is required",
-                minLength: {
-                  value: 6,
-                  message: "Password must be at least 6 characters",
-                },
-              })}
+              {...register("password", { required: true, minLength: 6 })}
+              placeholder="Password"
+              className="input input-bordered w-full"
             />
             {errors.password && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.password.message}
+              <p className="text-xs text-red-500 mt-1">
+                Password must be at least 6 characters
               </p>
             )}
           </div>
 
           {/* Confirm Password */}
           <div>
-            <label className="block mb-1 text-sm font-medium">
-              Confirm Password
-            </label>
             <input
               type="password"
-              placeholder="Confirm password"
-              className="w-full px-4 py-2 rounded-lg border border-base-300 focus:border-secondary focus:outline-none bg-base-100 text-neutral"
-              {...register("confirmPassword", {
-                required: "Confirm password is required",
-                validate: (value) =>
-                  value === watch("password") || "Passwords do not match",
-              })}
+              {...register("confirmPassword", { required: true })}
+              placeholder="Confirm Password"
+              className="input input-bordered w-full"
             />
             {errors.confirmPassword && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.confirmPassword.message}
+              <p className="text-xs text-red-500 mt-1">
+                Confirm Password is required
               </p>
             )}
           </div>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            className="w-full bg-primary text-base-100 py-3 rounded-lg hover:bg-secondary transition-colors flex justify-center items-center"
-          >
-            {loading ? <ImSpinner3 className="animate-spin" /> : "Register"}
-          </button>
+          <button className="btn btn-primary w-full mt-2">Register</button>
         </form>
 
-        <p className="text-sm text-center text-accent mt-4">
+        <p className="text-center text-sm mt-5">
           Already have an account?{" "}
-          <Link to="/login" className="text-primary hover:underline">
+          <Link
+            to="/login"
+            className="text-primary font-medium hover:underline"
+          >
             Login
           </Link>
         </p>
