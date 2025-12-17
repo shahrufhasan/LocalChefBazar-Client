@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import axiosPublic from "../../hooks/useAxiosPublic";
 import MealCard from "../Meals/MealCard";
 import { useNavigate } from "react-router";
@@ -10,9 +11,9 @@ const FeaturedMeals = () => {
   useEffect(() => {
     const fetchMeals = async () => {
       try {
-        const res = await axiosPublic.get("/meals");
+        const res = await axiosPublic.get("/meals?page=1&limit=6");
         // Get only first 6 meals
-        setMeals(res.data.slice(0, 6));
+        setMeals(res.data.meals || res.data.slice(0, 6));
       } catch (err) {
         console.error(err);
       }
@@ -25,7 +26,7 @@ const FeaturedMeals = () => {
   };
 
   return (
-    <div className="py-16 my-16">
+    <div className="py-16">
       <div className="text-center mb-8">
         <h2 className="text-4xl font-bold">Today's Special Meals</h2>
         <p className="text-gray-500 mt-2">

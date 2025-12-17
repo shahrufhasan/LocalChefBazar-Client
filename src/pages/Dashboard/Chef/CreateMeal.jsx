@@ -41,26 +41,32 @@ const CreateMeal = () => {
         );
         return;
       }
-    } catch (err) {
-      console.error(err);
-    }
 
-    if (!imageFile) {
-      Swal.fire("Error", "Please select an image", "error");
-      return;
-    }
+      const currentChef = userRes.data[0];
 
-    try {
+      if (!currentChef?.chefId) {
+        Swal.fire(
+          "Error",
+          "You need to be approved as a chef first. Please check your profile.",
+          "error"
+        );
+        return;
+      }
+
+      if (!imageFile) {
+        Swal.fire("Error", "Please select an image", "error");
+        return;
+      }
+
       setUploading(true);
 
-      // Upload image to ImgBB
       const imageURL = await imageUpload(imageFile);
 
       const mealData = {
         ...meal,
         foodImage: imageURL,
-        chefId: user?.uid,
-        chefName: user?.displayName,
+        chefId: currentChef.chefId,
+        chefName: currentChef.name || user?.displayName,
         rating: 0,
       };
 
@@ -76,7 +82,7 @@ const CreateMeal = () => {
           chefExperience: "",
         });
         setImageFile(null);
-        // Reset file input
+
         document.getElementById("imageInput").value = "";
       }
     } catch (err) {

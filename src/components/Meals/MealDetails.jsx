@@ -15,12 +15,12 @@ const MealDetails = () => {
     comment: "",
   });
 
-  // Fetch meal details
   useEffect(() => {
     const fetchMeal = async () => {
       try {
-        const res = await axiosPublic.get("/meals");
-        const found = res.data.find((m) => m._id === id);
+        const res = await axiosPublic.get("/meals?limit=1000");
+        const mealsData = res.data.meals || res.data;
+        const found = mealsData.find((m) => m._id === id);
         setMeal(found);
       } catch (err) {
         console.error(err);
@@ -29,7 +29,6 @@ const MealDetails = () => {
     fetchMeal();
   }, [id]);
 
-  // Fetch reviews
   useEffect(() => {
     const fetchReviews = async () => {
       try {

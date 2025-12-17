@@ -13,8 +13,18 @@ const OrderRequests = () => {
 
   const fetchOrders = async () => {
     try {
+      const userRes = await axiosPublic.get(`/users?email=${user.email}`);
+      const currentChef = userRes.data[0];
+
+      if (!currentChef?.chefId) {
+        console.log("No chefId found");
+        return;
+      }
+
       const res = await axiosPublic.get("/orders");
-      const chefOrders = res.data.filter((o) => o.chefId === user?.uid);
+      const chefOrders = res.data.filter(
+        (o) => o.chefId === currentChef.chefId
+      );
       setOrders(chefOrders);
     } catch (err) {
       console.error(err);

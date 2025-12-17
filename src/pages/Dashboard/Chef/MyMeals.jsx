@@ -18,8 +18,20 @@ const MyMeals = () => {
 
   const fetchMeals = async () => {
     try {
-      const res = await axiosPublic.get("/meals");
-      const chefMeals = res.data.filter((m) => m.chefId === user?.uid);
+      const userRes = await axiosPublic.get(`/users?email=${user.email}`);
+      const currentChef = userRes.data[0];
+
+      if (!currentChef?.chefId) {
+        console.log("No chefId found for this user");
+        return;
+      }
+
+      const res = await axiosPublic.get("/meals?limit=1000");
+      const mealsData = res.data.meals || res.data;
+
+      const chefMeals = mealsData.filter(
+        (m) => m.chefId === currentChef.chefId
+      );
       setMeals(chefMeals);
     } catch (err) {
       console.error(err);
