@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { useParams } from "react-router";
 import axiosPublic from "../../hooks/useAxiosPublic";
 import useAuth from "../../hooks/useAuth";
@@ -16,8 +17,9 @@ const OrderPage = () => {
   useEffect(() => {
     const fetchMeal = async () => {
       try {
-        const res = await axiosPublic.get("/meals");
-        const foundMeal = res.data.find((m) => m._id === id);
+        const res = await axiosPublic.get("/meals?limit=1000");
+        const mealsData = res.data.meals || res.data; // ✅ Handle paginated response
+        const foundMeal = mealsData.find((m) => m._id === id);
         setMeal(foundMeal);
       } catch (err) {
         console.error(err);
@@ -35,6 +37,7 @@ const OrderPage = () => {
       return;
     }
 
+    // Check if user is fraud
     try {
       const userRes = await axiosPublic.get(`/users?email=${user.email}`);
       if (userRes.data[0]?.status === "fraud") {
@@ -89,6 +92,10 @@ const OrderPage = () => {
 
   return (
     <div className="min-h-screen flex justify-center items-start p-6 bg-base-200">
+      <Helmet>
+        <title>Place Order | LocalChefBazaar</title>
+      </Helmet>
+
       <div className="w-full max-w-md bg-base-100 shadow-lg rounded-lg p-6">
         <h2 className="text-2xl font-bold mb-4 text-center">
           Confirm Your Order

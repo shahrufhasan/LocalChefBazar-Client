@@ -8,11 +8,16 @@ import PrivateRouters from "./PrivateRouters";
 import Home from "../pages/Home/Home";
 import Login from "../pages/Auth/Login/Login";
 import Register from "../pages/Auth/Register/Register";
+import ErrorPage from "../pages/ErrorPage/ErrorPage";
 
 // Meals Pages
 import Meals from "../components/Meals/Meals";
 import MealDetails from "../components/Meals/MealDetails";
 import OrderPage from "../components/Orders/OrderPage";
+
+// Payment Pages
+import Payment from "../pages/Payment/Payment";
+import PaymentSuccess from "../pages/Payment/PaymentSuccess";
 
 // Dashboard - User
 import MyProfile from "../pages/Dashboard/User/MyProfile";
@@ -31,13 +36,12 @@ import MyProfileAdmin from "../pages/Dashboard/Admin/MyProfile";
 import ManageUsers from "../pages/Dashboard/Admin/ManageUsers";
 import ManageRequests from "../pages/Dashboard/Admin/ManageRequests";
 import PlatformStats from "../pages/Dashboard/Admin/PlatformStatistic";
-import ErrorPage from "../pages/ErrorPage/ErrorPage";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <RootLayout></RootLayout>,
-    errorElement: <ErrorPage></ErrorPage>,
+    errorElement: <ErrorPage />,
     children: [
       { path: "/", element: <Home></Home> },
       { path: "/meals", element: <Meals></Meals> },
@@ -57,6 +61,22 @@ export const router = createBrowserRouter([
           </PrivateRouters>
         ),
       },
+      {
+        path: "/payment/:orderId",
+        element: (
+          <PrivateRouters>
+            <Payment />
+          </PrivateRouters>
+        ),
+      },
+      {
+        path: "/payment-success",
+        element: (
+          <PrivateRouters>
+            <PaymentSuccess />
+          </PrivateRouters>
+        ),
+      },
     ],
   },
   {
@@ -69,12 +89,12 @@ export const router = createBrowserRouter([
   },
   {
     path: "/dashboard",
-    errorElement: <ErrorPage></ErrorPage>,
     element: (
       <PrivateRouters>
         <DashboardLayout></DashboardLayout>
       </PrivateRouters>
     ),
+    errorElement: <ErrorPage />,
     children: [
       // User Dashboard
       { path: "user/my-profile", element: <MyProfile></MyProfile> },

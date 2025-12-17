@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import useAuth from "../../../hooks/useAuth";
 import axiosPublic from "../../../hooks/useAxiosPublic";
-import Swal from "sweetalert2";
 import { useNavigate } from "react-router";
 
 const MyOrders = () => {
@@ -22,42 +22,16 @@ const MyOrders = () => {
     }
   };
 
-  const handlePayment = async (orderId, totalPrice) => {
-    Swal.fire({
-      title: "Payment Confirmation",
-      text: `Total Amount: $${totalPrice}. Proceed to payment?`,
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonColor: "#10b981",
-      cancelButtonColor: "#6b7280",
-      confirmButtonText: "Yes, Pay Now",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          // Update payment status to "Paid"
-          const res = await axiosPublic.patch(`/orders/${orderId}/payment`, {
-            paymentStatus: "Paid",
-          });
-
-          if (res.data.modifiedCount > 0) {
-            Swal.fire({
-              icon: "success",
-              title: "Payment Successful!",
-              text: "Your payment has been processed successfully.",
-              confirmButtonText: "OK",
-            });
-            fetchOrders(); // Refresh orders
-          }
-        } catch (err) {
-          console.error(err);
-          Swal.fire("Error", "Payment failed. Please try again.", "error");
-        }
-      }
-    });
+  const handlePayment = (orderId, totalPrice) => {
+    navigate(`/payment/${orderId}`);
   };
 
   return (
     <div className="p-6">
+      <Helmet>
+        <title>My Orders | Dashboard</title>
+      </Helmet>
+
       <h2 className="text-2xl font-bold mb-4">My Orders</h2>
       <div className="space-y-4">
         {orders.length > 0 ? (
@@ -70,7 +44,7 @@ const MyOrders = () => {
             return (
               <div
                 key={order._id}
-                className="p-4 bg-base-100 shadow rounded-lg border"
+                className="p-4 bg-base-100 shadow rounded-lg"
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
