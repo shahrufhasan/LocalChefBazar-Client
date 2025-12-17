@@ -1,117 +1,86 @@
-import React, { useEffect, useState } from "react";
-import axiosPublic from "../../../hooks/useAxiosPublic";
-import useAuth from "../../../hooks/useAuth";
 import Swal from "sweetalert2";
+import { useQuery } from "@tanstack/react-query";
+import axiosPublic from "../../../hooks/useAxiosPublic";
 
-const ManageRequests = () => {
-  const { user } = useAuth();
-  const [dbUser, setDbUser] = useState(null);
-  const [requests, setRequests] = useState([]);
+const ManageUsers = () => {
+  const {
+    data: users = [],
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ["users"],
+    queryFn: async () => {
+      const res = await axiosPublic.get("/users");
+      return res.data;
+    },
+  });
 
-  // fetch logged-in user from DB
-  useEffect(() => {
-    if (user?.email) {
-      axiosPublic.get(`/users/${user.email}`).then((res) => {
-        setDbUser(res.data);
-      });
-    }
-  }, [user]);
+  if (isLoading) return <p>Loading users...</p>;
 
-  // fetch requests
-  useEffect(() => {
-    axiosPublic.get("/requests").then((res) => {
-      setRequests(res.data);
-    });
-  }, []);
-
-  // approve / reject
-  const handleUpdateStatus = async (request, status) => {
+  const handleRoleUpdate = async (email, role) => {
     try {
-      await axiosPublic.patch(`/requests/${request._id}`, {
-        requestStatus: status,
+      await axiosPublic.patch(`/users/${email}/role`, {
+        role,
+        status: "active",
       });
 
-      if (status === "approved") {
-        await axiosPublic.patch(`/users/${request.userEmail}/role`, {
-          role: request.requestType,
-          status: "active",
-          chefId: request.requestType === "chef" ? `CHEF-${Date.now()}` : null,
-        });
-      }
-
-      Swal.fire("Success", `Request ${status}`, "success");
-
-      setRequests((prev) =>
-        prev.map((r) =>
-          r._id === request._id ? { ...r, requestStatus: status } : r
-        )
-      );
-    } catch (err) {
-      console.error(err);
-      Swal.fire("Error", "Action failed", "error");
+      Swal.fire("Success", `User promoted to ${role}`, "success");
+      refetch(); // 🔥 instantly refresh UI
+    } catch (error) {
+      Swal.fire("Error", "Failed to update user role", "error");
     }
   };
 
-  // ❌ Block non-admin users
-  if (!dbUser || dbUser.role !== "admin") {
-    return (
-      <div className="p-6 text-red-500 font-semibold">
-        Access denied. Admins only.
-      </div>
-    );
-  }
-
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Manage Requests</h2>
+      <h2 className="text-2xl font-bold mb-4">Manage Users (Admin)</h2>
 
-      {requests.length === 0 ? (
-        <p>No requests found.</p>
-      ) : (
-        <div className="space-y-4">
-          {requests.map((r) => (
-            <div
-              key={r._id}
-              className="p-4 bg-base-100 shadow rounded-lg flex justify-between items-center"
-            >
-              <div>
-                <p>
-                  <strong>User:</strong> {r.userName}
-                </p>
-                <p>
-                  <strong>Email:</strong> {r.userEmail}
-                </p>
-                <p>
-                  <strong>Type:</strong> {r.requestType}
-                </p>
-                <p>
-                  <strong>Status:</strong>{" "}
-                  <span className="capitalize">{r.requestStatus}</span>
-                </p>
-              </div>
+      <div className="overflow-x-auto">
+        <table className="table table-zebra w-full">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Action</th>
+            </tr>
+          </thead>
 
-              {r.requestStatus === "pending" && (
-                <div className="flex gap-2">
-                  <button
-                    className="btn btn-success btn-sm"
-                    onClick={() => handleUpdateStatus(r, "approved")}
-                  >
-                    Approve
-                  </button>
-                  <button
-                    className="btn btn-error btn-sm"
-                    onClick={() => handleUpdateStatus(r, "rejected")}
-                  >
-                    Reject
-                  </button>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+          <tbody>
+            {users.map((user, index) => (
+              <tr key={user._id}>
+                <td>{index + 1}</td>
+                <td>{user.displayName}</td>
+                <td>{user.email}</td>
+                <td className="capitalize">{user.role || "user"}</td>
+
+                <td className="flex gap-2">
+                  {user.role !== "admin" && (
+                    <button
+                      className="btn btn-xs btn-secondary"
+                      onClick={() => handleRoleUpdate(user.email, "admin")}
+                    >
+                      Make Admin
+                    </button>
+                  )}
+
+                  {user.role !== "chef" && (
+                    <button
+                      className="btn btn-xs btn-primary"
+                      onClick={() => handleRoleUpdate(user.email, "chef")}
+                    >
+                      Make Chef
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
 
-export default ManageRequests;
+export default ManageUsers;
