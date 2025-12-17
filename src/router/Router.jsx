@@ -31,11 +31,13 @@ import MyProfileAdmin from "../pages/Dashboard/Admin/MyProfile";
 import ManageUsers from "../pages/Dashboard/Admin/ManageUsers";
 import ManageRequests from "../pages/Dashboard/Admin/ManageRequests";
 import PlatformStats from "../pages/Dashboard/Admin/PlatformStatistic";
+import ErrorPage from "../pages/ErrorPage/ErrorPage";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <RootLayout></RootLayout>,
+    errorElement: <ErrorPage></ErrorPage>,
     children: [
       { path: "/", element: <Home></Home> },
       { path: "/meals", element: <Meals></Meals> },
@@ -67,6 +69,7 @@ export const router = createBrowserRouter([
   },
   {
     path: "/dashboard",
+    errorElement: <ErrorPage></ErrorPage>,
     element: (
       <PrivateRouters>
         <DashboardLayout></DashboardLayout>

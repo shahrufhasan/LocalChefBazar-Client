@@ -66,6 +66,7 @@ const OrderPage = () => {
           price: meal.price,
           quantity: quantity,
           chefId: meal.chefId,
+          chefName: meal.chefName,
           userEmail: user.email,
           userAddress,
           orderStatus: "pending",
