@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import useAuth from "../../../hooks/useAuth";
 import axiosPublic from "../../../hooks/useAxiosPublic";
 
-const FavoriteMeals = () => {
+const FavoriteMeal = () => {
   const { user } = useAuth();
   const [favorites, setFavorites] = useState([]);
 
@@ -44,4 +44,4 @@ const FavoriteMeals = () => {
   );
 };
 
-export default FavoriteMeals;
+export default FavoriteMeal;

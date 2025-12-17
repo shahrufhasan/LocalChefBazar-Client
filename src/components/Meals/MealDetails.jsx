@@ -79,7 +79,9 @@ const MealDetails = () => {
     }
     const reviewData = {
       foodId: id,
+      foodName: meal.foodName,
       reviewerName: user.displayName,
+      reviewerEmail: user.email,
       reviewerImage: user.photoURL,
       rating: Number(newReview.rating),
       comment: newReview.comment,

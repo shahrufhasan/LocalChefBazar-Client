@@ -19,7 +19,10 @@ const MealCard = ({ meal, onSeeDetails }) => {
         <p className="text-sm text-gray-600">
           Delivery Area: {meal.deliveryArea}
         </p>
-        <p className="font-bold text-lg mt-2">${meal.price.toFixed(2)}</p>
+        <p className="font-bold text-lg mt-2">
+          ${Number(meal.price).toFixed(2)}
+        </p>
+
         <div className="card-actions mt-2">
           <button
             className="btn btn-primary btn-block"

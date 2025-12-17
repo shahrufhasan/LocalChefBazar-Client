@@ -9,6 +9,8 @@ const MyReview = () => {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
+        if (!user?.email) return;
+
         const res = await axiosPublic.get(
           `/reviews?reviewerEmail=${user.email}`
         );
@@ -17,7 +19,8 @@ const MyReview = () => {
         console.error(err);
       }
     };
-    if (user?.email) fetchReviews();
+
+    fetchReviews();
   }, [user]);
 
   return (
@@ -28,13 +31,16 @@ const MyReview = () => {
           reviews.map((r) => (
             <div key={r._id} className="p-4 bg-base-100 shadow rounded-lg">
               <p>
-                <strong>Meal:</strong> {r.foodName}
+                <strong>Meal:</strong> {r.foodName || "Unknown"}
               </p>
               <p>
-                <strong>Rating:</strong> {r.rating}
+                <strong>Rating:</strong> {r.rating} ⭐
               </p>
               <p>
                 <strong>Comment:</strong> {r.comment}
+              </p>
+              <p className="text-xs text-gray-500">
+                {new Date(r.date).toLocaleString()}
               </p>
             </div>
           ))
