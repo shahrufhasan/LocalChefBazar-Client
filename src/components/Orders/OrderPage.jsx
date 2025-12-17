@@ -35,6 +35,20 @@ const OrderPage = () => {
       return;
     }
 
+    try {
+      const userRes = await axiosPublic.get(`/users?email=${user.email}`);
+      if (userRes.data[0]?.status === "fraud") {
+        Swal.fire(
+          "Error",
+          "Your account has been marked as fraud. You cannot place orders.",
+          "error"
+        );
+        return;
+      }
+    } catch (err) {
+      console.error(err);
+    }
+
     const totalPrice = meal.price * quantity;
 
     Swal.fire({

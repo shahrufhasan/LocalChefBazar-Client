@@ -17,23 +17,34 @@ const ManageUsers = () => {
 
   if (isLoading) return <p>Loading users...</p>;
 
-  const handleRoleUpdate = async (email, role) => {
-    try {
-      await axiosPublic.patch(`/users/${email}/role`, {
-        role,
-        status: "active",
-      });
+  const handleMakeFraud = async (email) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You want to mark this user as fraud?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, mark as fraud!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await axiosPublic.patch(`/users/${email}/status`, {
+            status: "fraud",
+          });
 
-      Swal.fire("Success", `User promoted to ${role}`, "success");
-      refetch(); // 🔥 instantly refresh UI
-    } catch (error) {
-      Swal.fire("Error", "Failed to update user role", "error");
-    }
+          Swal.fire("Success", "User marked as fraud", "success");
+          refetch();
+        } catch (error) {
+          Swal.fire("Error", "Failed to update user status", "error");
+        }
+      }
+    });
   };
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Manage Users (Admin)</h2>
+      <h2 className="text-2xl font-bold mb-4">Manage Users</h2>
 
       <div className="overflow-x-auto">
         <table className="table table-zebra w-full">
@@ -43,6 +54,7 @@ const ManageUsers = () => {
               <th>Name</th>
               <th>Email</th>
               <th>Role</th>
+              <th>Status</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -51,27 +63,37 @@ const ManageUsers = () => {
             {users.map((user, index) => (
               <tr key={user._id}>
                 <td>{index + 1}</td>
-                <td>{user.displayName}</td>
+                <td>{user.name || user.displayName}</td>
                 <td>{user.email}</td>
                 <td className="capitalize">{user.role || "user"}</td>
+                <td>
+                  <span
+                    className={`badge ${
+                      user.status === "fraud" ? "badge-error" : "badge-success"
+                    }`}
+                  >
+                    {user.status || "active"}
+                  </span>
+                </td>
 
-                <td className="flex gap-2">
-                  {user.role !== "admin" && (
+                <td>
+                  {user.role !== "admin" && user.status !== "fraud" && (
                     <button
-                      className="btn btn-xs btn-secondary"
-                      onClick={() => handleRoleUpdate(user.email, "admin")}
+                      className="btn btn-xs btn-error"
+                      onClick={() => handleMakeFraud(user.email)}
                     >
-                      Make Admin
+                      Make Fraud
                     </button>
                   )}
 
-                  {user.role !== "chef" && (
-                    <button
-                      className="btn btn-xs btn-primary"
-                      onClick={() => handleRoleUpdate(user.email, "chef")}
-                    >
-                      Make Chef
-                    </button>
+                  {user.status === "fraud" && (
+                    <span className="text-xs text-gray-500">
+                      Marked as Fraud
+                    </span>
+                  )}
+
+                  {user.role === "admin" && (
+                    <span className="text-xs text-gray-500">Admin</span>
                   )}
                 </td>
               </tr>
