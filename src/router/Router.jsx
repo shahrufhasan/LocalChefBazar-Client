@@ -1,7 +1,8 @@
-// src/routes/router.jsx
+// src/router/Router.jsx
 import { createBrowserRouter } from "react-router";
 import RootLayout from "../layout/RootLayout";
 import DashboardLayout from "../layout/DashboardLayout";
+import PrivateRouters from "./PrivateRouters";
 
 // Public Pages
 import Home from "../pages/Home/Home";
@@ -38,8 +39,22 @@ export const router = createBrowserRouter([
     children: [
       { path: "/", element: <Home></Home> },
       { path: "/meals", element: <Meals></Meals> },
-      { path: "/meal-details/:id", element: <MealDetails></MealDetails> },
-      { path: "/order/:id", element: <OrderPage></OrderPage> },
+      {
+        path: "/meal-details/:id",
+        element: (
+          <PrivateRouters>
+            <MealDetails></MealDetails>
+          </PrivateRouters>
+        ),
+      },
+      {
+        path: "/order/:id",
+        element: (
+          <PrivateRouters>
+            <OrderPage></OrderPage>
+          </PrivateRouters>
+        ),
+      },
     ],
   },
   {
@@ -52,7 +67,11 @@ export const router = createBrowserRouter([
   },
   {
     path: "/dashboard",
-    element: <DashboardLayout></DashboardLayout>,
+    element: (
+      <PrivateRouters>
+        <DashboardLayout></DashboardLayout>
+      </PrivateRouters>
+    ),
     children: [
       // User Dashboard
       { path: "user/my-profile", element: <MyProfile></MyProfile> },
@@ -64,10 +83,16 @@ export const router = createBrowserRouter([
       { path: "chef/my-profile", element: <MyProfileChef></MyProfileChef> },
       { path: "chef/create-meal", element: <CreateMeal></CreateMeal> },
       { path: "chef/my-meals", element: <MyMeals></MyMeals> },
-      { path: "chef/order-requests", element: <OrderRequests></OrderRequests> },
+      {
+        path: "chef/order-requests",
+        element: <OrderRequests></OrderRequests>,
+      },
 
       // Admin Dashboard
-      { path: "admin/my-profile", element: <MyProfileAdmin></MyProfileAdmin> },
+      {
+        path: "admin/my-profile",
+        element: <MyProfileAdmin></MyProfileAdmin>,
+      },
       { path: "admin/manage-users", element: <ManageUsers></ManageUsers> },
       {
         path: "admin/manage-requests",
