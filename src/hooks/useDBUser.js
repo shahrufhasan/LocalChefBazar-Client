@@ -14,7 +14,7 @@ const useDbUser = () => {
     async () => {
       if (!user?.email) return null;
       const res = await axiosPublic.get(`/users?email=${user.email}`);
-      return res.data[0]; // should return the first user matching the email
+      return res.data[0];
     },
     {
       enabled: !!user?.email,

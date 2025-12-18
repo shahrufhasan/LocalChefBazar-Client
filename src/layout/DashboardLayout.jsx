@@ -19,7 +19,6 @@ const DashboardLayout = () => {
   const { user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Fetch user role from database
   const { data: currentUser, isLoading } = useQuery({
     queryKey: ["current-user", user?.email],
     queryFn: async () => {
@@ -44,7 +43,6 @@ const DashboardLayout = () => {
 
   return (
     <div className="flex min-h-screen bg-base-200">
-      {/* Mobile Menu Button */}
       <button
         className="lg:hidden fixed top-4 left-4 z-50 btn btn-primary btn-sm"
         onClick={() => setSidebarOpen(!sidebarOpen)}
