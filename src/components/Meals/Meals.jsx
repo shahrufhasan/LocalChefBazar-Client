@@ -84,7 +84,7 @@ const Meals = () => {
   }
 
   return (
-    <div className="min-h-screen my-16 py-16 px-6">
+    <div className="min-h-screen my-16 py-16">
       <Helmet>
         <title>Meals | LocalChefBazaar</title>
       </Helmet>
@@ -113,7 +113,7 @@ const Meals = () => {
         {/* Sort by Price */}
         <button
           onClick={handleSort}
-          className="btn btn-secondary w-full md:w-auto"
+          className="btn btn-outline w-full text-gray-500 md:w-auto"
         >
           Sort by Price ({sortOrder === "asc" ? "Low → High" : "High → Low"})
         </button>
@@ -148,7 +148,7 @@ const Meals = () => {
         </div>
       )}
 
-      {/* Pagination Controls */}
+      {/* Pagination  */}
       {totalPages > 1 && (
         <div className="flex justify-center items-center gap-2 mt-8">
           <button
@@ -186,7 +186,6 @@ const Meals = () => {
         </div>
       )}
 
-      {/* Show current page info */}
       <div className="text-center mt-4 text-sm text-gray-600">
         Showing {meals.length} meals - Page {currentPage} of {totalPages}
       </div>

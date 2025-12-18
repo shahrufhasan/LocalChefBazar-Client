@@ -19,7 +19,7 @@ const CustomerReviews = () => {
 
   return (
     <div className="py-16">
-      <div className="max-w-6xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold">What Our Customers Say</h2>
           <p className="text-gray-500 mt-2">Real reviews from real people</p>

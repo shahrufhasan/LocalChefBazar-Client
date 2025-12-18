@@ -25,7 +25,7 @@ const FeaturedMeals = () => {
   };
 
   return (
-    <div className="py-16">
+    <div className="py-16 max-w-7xl">
       <div className="text-center mb-12">
         <h2 className="text-4xl font-bold">Today's Special Meals</h2>
         <p className="text-gray-500">
