@@ -25,7 +25,6 @@ const Payment = () => {
 
   const fetchOrderAndCreateIntent = async () => {
     try {
-      // Fetch order details
       const ordersRes = await axiosSecure.get("/orders");
       const foundOrder = ordersRes.data.find((o) => o._id === orderId);
 
@@ -39,7 +38,6 @@ const Payment = () => {
 
       const totalAmount = foundOrder.price * foundOrder.quantity;
 
-      // Create payment intent
       const paymentRes = await axiosSecure.post("/create-payment-intent", {
         amount: totalAmount,
       });
@@ -57,7 +55,6 @@ const Payment = () => {
     try {
       const totalAmount = order.price * order.quantity;
 
-      // Save payment history
       const paymentData = {
         orderId: order._id,
         userEmail: user.email,
@@ -69,7 +66,6 @@ const Payment = () => {
 
       await axiosSecure.post("/payment-history", paymentData);
 
-      // Update order payment status
       await axiosSecure.patch(`/orders/${order._id}/payment`, {
         paymentStatus: "Paid",
       });

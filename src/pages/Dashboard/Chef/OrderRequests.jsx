@@ -16,7 +16,6 @@ const OrderRequests = () => {
   } = useQuery({
     queryKey: ["chef-orders", user?.email],
     queryFn: async () => {
-      // Get chef's actual chefId
       const userRes = await axiosSecure.get(`/users?email=${user.email}`);
       const currentChef = userRes.data[0];
 
@@ -223,7 +222,7 @@ const OrderRequests = () => {
                   {order.orderStatus === "cancelled" && (
                     <div className="w-full p-3 bg-red-50 rounded-lg">
                       <p className="text-sm text-red-700">
-                        ❌ This order has been cancelled.
+                        This order has been cancelled.
                       </p>
                     </div>
                   )}

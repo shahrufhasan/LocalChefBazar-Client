@@ -39,7 +39,6 @@ const PlatformStatistics = () => {
     fetchStats();
   }, [axiosSecure]);
 
-  // Data for the chart
   const chartData = [
     {
       name: "Users",

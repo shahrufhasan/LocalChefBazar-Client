@@ -20,7 +20,6 @@ const MyMeals = () => {
 
   const fetchMeals = async () => {
     try {
-      // First get current user's chefId from database
       const userRes = await axiosSecure.get(`/users?email=${user.email}`);
       const currentChef = userRes.data[0];
 
@@ -29,11 +28,9 @@ const MyMeals = () => {
         return;
       }
 
-      // Fetch all meals
       const res = await axiosSecure.get("/meals?limit=1000");
       const mealsData = res.data.meals || res.data;
 
-      // Filter by the chef's actual chefId from database
       const chefMeals = mealsData.filter(
         (m) => m.chefId === currentChef.chefId
       );
@@ -80,7 +77,6 @@ const MyMeals = () => {
 
       let finalData = { ...updateData };
 
-      // If user selected a new image, upload it
       if (imageFile) {
         const imageURL = await imageUpload(imageFile);
         finalData.foodImage = imageURL;

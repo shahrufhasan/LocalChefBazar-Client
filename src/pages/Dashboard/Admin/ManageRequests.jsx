@@ -40,7 +40,6 @@ const ManageRequests = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          // ✅ Use axiosSecure for PATCH request
           const res = await axiosSecure.patch(`/requests/${id}`, {
             requestStatus: status,
           });

@@ -22,7 +22,6 @@ const Login = () => {
       const { email, password } = data;
       const result = await singInUser(email, password);
 
-      // ✅ Get Firebase ID Token immediately after login
       const token = await result.user.getIdToken();
       console.log("Firebase Token obtained:", token ? "Yes" : "No");
 

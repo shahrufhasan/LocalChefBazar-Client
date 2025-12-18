@@ -63,18 +63,15 @@ const ProfileCard = () => {
     try {
       let photoURL = formData.photoURL;
 
-      // Upload image if selected
       if (imageFile) {
         photoURL = await imageUpload(imageFile);
       }
 
-      // 1. Update Firebase profile (name and photo)
       await updateUser({
         displayName: formData.name,
         photoURL: photoURL,
       });
 
-      // 2. Update MongoDB user data
       const res = await axiosSecure.patch(`/users/${user.email}`, {
         name: formData.name,
         photoURL: photoURL,
@@ -82,7 +79,6 @@ const ProfileCard = () => {
       });
 
       if (res.data.modifiedCount > 0) {
-        // 3. Update local state
         setCurrentUser({
           ...currentUser,
           name: formData.name,
@@ -184,7 +180,6 @@ const ProfileCard = () => {
             </div>
 
             {isEditing ? (
-              /* ========== EDIT MODE ========== */
               <form onSubmit={handleUpdateProfile} className="space-y-6">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -258,7 +253,6 @@ const ProfileCard = () => {
                 </div>
               </form>
             ) : (
-              /* ========== VIEW MODE ========== */
               <div className="space-y-6">
                 <div className="text-center">
                   <h2 className="text-3xl font-bold text-gray-800 mb-1">

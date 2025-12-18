@@ -1,37 +1,25 @@
-// src/router/Router.jsx
 import { createBrowserRouter } from "react-router";
 import RootLayout from "../layout/RootLayout";
 import DashboardLayout from "../layout/DashboardLayout";
 import PrivateRouters from "./PrivateRouters";
-
-// Public Pages
 import Home from "../pages/Home/Home";
 import Login from "../pages/Auth/Login/Login";
 import Register from "../pages/Auth/Register/Register";
 import ErrorPage from "../pages/ErrorPage/ErrorPage";
-
-// Meals Pages
 import Meals from "../components/Meals/Meals";
 import MealDetails from "../components/Meals/MealDetails";
 import OrderPage from "../components/Orders/OrderPage";
 
-// Payment Pages
 import Payment from "../pages/Payment/Payment";
 import PaymentSuccess from "../pages/Payment/PaymentSuccess";
-
-// Dashboard - User
 import MyProfile from "../pages/Dashboard/User/MyProfile";
 import MyOrders from "../pages/Dashboard/User/MyOrders";
 import MyReview from "../pages/Dashboard/User/MyReviews";
 import FavoriteMeal from "../pages/Dashboard/User/FavoriteMeal";
-
-// Dashboard - Chef
 import MyProfileChef from "../pages/Dashboard/Chef/MyProfile";
 import CreateMeal from "../pages/Dashboard/Chef/CreateMeal";
 import MyMeals from "../pages/Dashboard/Chef/MyMeals";
 import OrderRequests from "../pages/Dashboard/Chef/OrderRequests";
-
-// Dashboard - Admin
 import MyProfileAdmin from "../pages/Dashboard/Admin/MyProfile";
 import ManageUsers from "../pages/Dashboard/Admin/ManageUsers";
 import ManageRequests from "../pages/Dashboard/Admin/ManageRequests";

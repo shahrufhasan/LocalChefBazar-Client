@@ -126,7 +126,7 @@ const MealDetails = () => {
   if (!meal) return <div className="text-center mt-10">Loading...</div>;
 
   return (
-    <div className="min-h-screen flex justify-center items-center py-16 px-4 bg-base-200">
+    <div className="min-h-screen flex justify-center items-center py-16 px-4">
       <Helmet>
         <title>{meal.foodName} | LocalChefBazaar</title>
       </Helmet>

@@ -29,7 +29,6 @@ const CheckoutForm = ({ orderId, amount, onSuccess }) => {
       Swal.fire("Payment Failed", error.message, "error");
       setLoading(false);
     } else if (paymentIntent && paymentIntent.status === "succeeded") {
-      // Payment successful
       onSuccess(paymentIntent);
     }
   };

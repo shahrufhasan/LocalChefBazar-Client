@@ -35,7 +35,7 @@ const FavoriteMeal = () => {
           const res = await axiosPublic.delete(`/favorites/${id}`);
           if (res.data.deletedCount > 0) {
             Swal.fire("Deleted!", "Meal removed from favorites.", "success");
-            // Refresh the list
+
             fetchFavorites();
           }
         } catch (err) {
