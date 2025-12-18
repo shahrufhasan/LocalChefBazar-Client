@@ -1,5 +1,9 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import {
+  getAuth,
+  setPersistence,
+  browserLocalPersistence,
+} from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_apiKey,
@@ -13,4 +17,13 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
+// Get Auth instance
 export const auth = getAuth(app);
+
+setPersistence(auth, browserLocalPersistence)
+  .then(() => {
+    console.log("Firebase persistence enabled");
+  })
+  .catch((error) => {
+    console.error("Error enabling persistence:", error);
+  });

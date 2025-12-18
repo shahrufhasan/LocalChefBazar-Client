@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import useAuth from "../../../hooks/useAuth";
-import axiosPublic from "../../../hooks/useAxiosPublic";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { useNavigate } from "react-router";
 
 const MyOrders = () => {
   const { user } = useAuth();
+  const axiosSecure = useAxiosSecure();
   const [orders, setOrders] = useState([]);
   const navigate = useNavigate();
 
@@ -15,7 +16,7 @@ const MyOrders = () => {
 
   const fetchOrders = async () => {
     try {
-      const res = await axiosPublic.get(`/orders?userEmail=${user.email}`);
+      const res = await axiosSecure.get(`/orders?userEmail=${user.email}`);
       setOrders(res.data);
     } catch (err) {
       console.error(err);
@@ -44,7 +45,7 @@ const MyOrders = () => {
             return (
               <div
                 key={order._id}
-                className="p-4 bg-base-100 shadow rounded-lg"
+                className="p-4 bg-base-100 shadow rounded-lg border"
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>

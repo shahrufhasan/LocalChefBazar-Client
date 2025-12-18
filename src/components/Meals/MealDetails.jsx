@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { useParams, useNavigate } from "react-router";
 import axiosPublic from "../../hooks/useAxiosPublic";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 import useAuth from "../../hooks/useAuth";
 import Swal from "sweetalert2";
 
 const MealDetails = () => {
-  const { id } = useParams(); // meal id
+  const { id } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const axiosSecure = useAxiosSecure();
   const [meal, setMeal] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState({
@@ -57,7 +60,7 @@ const MealDetails = () => {
       addedTime: new Date().toISOString(),
     };
     try {
-      const res = await axiosPublic.post("/favorites", favoriteData);
+      const res = await axiosSecure.post("/favorites", favoriteData);
       if (res.data.insertedId) {
         Swal.fire("Success", "Meal added to favorites!", "success");
       } else {
@@ -65,7 +68,11 @@ const MealDetails = () => {
       }
     } catch (err) {
       console.error(err);
-      Swal.fire("Error", "Failed to add to favorites", "error");
+      if (err.response?.status === 409) {
+        Swal.fire("Info", "Meal is already in favorites", "info");
+      } else {
+        Swal.fire("Error", "Failed to add to favorites", "error");
+      }
     }
   };
 
@@ -87,7 +94,7 @@ const MealDetails = () => {
       date: new Date().toISOString(),
     };
     try {
-      const res = await axiosPublic.post("/reviews", reviewData);
+      const res = await axiosSecure.post("/reviews", reviewData);
       if (res.data.insertedId) {
         setReviews([...reviews, reviewData]);
         setNewReview({ rating: "", comment: "" });
@@ -105,13 +112,17 @@ const MealDetails = () => {
       Swal.fire("Error", "You must be logged in to place an order", "error");
       return;
     }
-    navigate(`/order/${meal._id}`); // fix: match router path
+    navigate(`/order/${meal._id}`);
   };
 
   if (!meal) return <div className="text-center mt-10">Loading...</div>;
 
   return (
     <div className="min-h-screen flex justify-center items-start p-6 bg-base-200">
+      <Helmet>
+        <title>{meal.foodName} | LocalChefBazaar</title>
+      </Helmet>
+
       <div className="w-full max-w-4xl bg-base-100 shadow-lg rounded-lg p-6">
         {/* Meal Info */}
         <div className="flex flex-col md:flex-row gap-6">
@@ -141,7 +152,7 @@ const MealDetails = () => {
               <strong>Estimated Delivery Time:</strong> {meal.deliveryTime}
             </p>
             <p>
-              <strong>Chef’s Experience:</strong> {meal.chefExperience}
+              <strong>Chef's Experience:</strong> {meal.chefExperience}
             </p>
 
             <div className="flex gap-3 mt-4">

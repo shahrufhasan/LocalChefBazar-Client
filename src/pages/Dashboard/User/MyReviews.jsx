@@ -1,23 +1,22 @@
 import React, { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import useAuth from "../../../hooks/useAuth";
-import axiosPublic from "../../../hooks/useAxiosPublic";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import Swal from "sweetalert2";
 
-const MyReview = () => {
+const FavoriteMeal = () => {
   const { user } = useAuth();
-  const [reviews, setReviews] = useState([]);
-  const [editingReview, setEditingReview] = useState(null);
-  const [updateData, setUpdateData] = useState({ rating: "", comment: "" });
+  const axiosSecure = useAxiosSecure();
+  const [favorites, setFavorites] = useState([]);
 
   useEffect(() => {
-    fetchReviews();
+    fetchFavorites();
   }, [user]);
 
-  const fetchReviews = async () => {
+  const fetchFavorites = async () => {
     try {
-      if (!user?.email) return;
-      const res = await axiosPublic.get(`/reviews?reviewerEmail=${user.email}`);
-      setReviews(res.data);
+      const res = await axiosSecure.get(`/favorites?userEmail=${user.email}`);
+      setFavorites(res.data);
     } catch (err) {
       console.error(err);
     }
@@ -26,7 +25,7 @@ const MyReview = () => {
   const handleDelete = async (id) => {
     Swal.fire({
       title: "Are you sure?",
-      text: "You want to delete this review?",
+      text: "You want to remove this meal from favorites?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
@@ -35,130 +34,66 @@ const MyReview = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosPublic.delete(`/reviews/${id}`);
+          const res = await axiosSecure.delete(`/favorites/${id}`);
           if (res.data.deletedCount > 0) {
-            Swal.fire("Deleted!", "Review has been deleted.", "success");
-            fetchReviews();
+            Swal.fire("Deleted!", "Meal removed from favorites.", "success");
+            fetchFavorites();
           }
         } catch (err) {
           console.error(err);
-          Swal.fire("Error", "Failed to delete review", "error");
+          Swal.fire("Error", "Failed to delete favorite", "error");
         }
       }
     });
   };
 
-  const handleUpdateClick = (review) => {
-    setEditingReview(review._id);
-    setUpdateData({ rating: review.rating, comment: review.comment });
-  };
-
-  const handleUpdateSubmit = async (id) => {
-    try {
-      const res = await axiosPublic.patch(`/reviews/${id}`, updateData);
-      if (res.data.modifiedCount > 0) {
-        Swal.fire("Updated!", "Review has been updated.", "success");
-        setEditingReview(null);
-        fetchReviews();
-      }
-    } catch (err) {
-      console.error(err);
-      Swal.fire("Error", "Failed to update review", "error");
-    }
-  };
-
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">My Reviews</h2>
-      <div className="space-y-4">
-        {reviews.length > 0 ? (
-          reviews.map((r) => (
-            <div key={r._id} className="p-4 bg-base-100 shadow rounded-lg">
-              {editingReview === r._id ? (
-                // Edit Mode
-                <div className="space-y-3">
-                  <div>
-                    <label className="font-semibold">Rating (1-5)</label>
-                    <input
-                      type="number"
-                      min="1"
-                      max="5"
-                      value={updateData.rating}
-                      onChange={(e) =>
-                        setUpdateData({ ...updateData, rating: e.target.value })
-                      }
-                      className="input input-bordered w-32 ml-2"
-                    />
-                  </div>
-                  <div>
-                    <label className="font-semibold">Comment</label>
-                    <textarea
-                      value={updateData.comment}
-                      onChange={(e) =>
-                        setUpdateData({
-                          ...updateData,
-                          comment: e.target.value,
-                        })
-                      }
-                      className="textarea textarea-bordered w-full mt-2"
-                      rows="3"
-                    />
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      className="btn btn-success btn-sm"
-                      onClick={() => handleUpdateSubmit(r._id)}
-                    >
-                      Save
-                    </button>
-                    <button
-                      className="btn btn-ghost btn-sm"
-                      onClick={() => setEditingReview(null)}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                // View Mode
-                <div>
-                  <p>
-                    <strong>Meal:</strong> {r.foodName || "Unknown"}
-                  </p>
-                  <p>
-                    <strong>Rating:</strong> {r.rating} ⭐
-                  </p>
-                  <p>
-                    <strong>Comment:</strong> {r.comment}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-2">
-                    {new Date(r.date).toLocaleString()}
-                  </p>
+      <Helmet>
+        <title>Favorite Meals | Dashboard</title>
+      </Helmet>
 
-                  <div className="flex gap-2 mt-3">
-                    <button
-                      className="btn btn-warning btn-sm"
-                      onClick={() => handleUpdateClick(r)}
-                    >
-                      Update
-                    </button>
+      <h2 className="text-2xl font-bold mb-4">Favorite Meals</h2>
+
+      {favorites.length > 0 ? (
+        <div className="overflow-x-auto">
+          <table className="table table-zebra w-full">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Meal Name</th>
+                <th>Chef Name</th>
+                <th>Price</th>
+                <th>Date Added</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {favorites.map((fav, index) => (
+                <tr key={fav._id}>
+                  <td>{index + 1}</td>
+                  <td>{fav.mealName}</td>
+                  <td>{fav.chefName}</td>
+                  <td>${fav.price}</td>
+                  <td>{new Date(fav.addedTime).toLocaleDateString()}</td>
+                  <td>
                     <button
                       className="btn btn-error btn-sm"
-                      onClick={() => handleDelete(r._id)}
+                      onClick={() => handleDelete(fav._id)}
                     >
                       Delete
                     </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          ))
-        ) : (
-          <p>No reviews yet.</p>
-        )}
-      </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <p>No favorite meals yet.</p>
+      )}
     </div>
   );
 };
 
-export default MyReview;
+export default FavoriteMeal;

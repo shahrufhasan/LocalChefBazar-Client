@@ -2,12 +2,14 @@ import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { useParams } from "react-router";
 import axiosPublic from "../../hooks/useAxiosPublic";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 import useAuth from "../../hooks/useAuth";
 import Swal from "sweetalert2";
 
 const OrderPage = () => {
   const { id } = useParams();
   const { user } = useAuth();
+  const axiosSecure = useAxiosSecure();
 
   const [meal, setMeal] = useState(null);
   const [quantity, setQuantity] = useState(1);
@@ -18,7 +20,7 @@ const OrderPage = () => {
     const fetchMeal = async () => {
       try {
         const res = await axiosPublic.get("/meals?limit=1000");
-        const mealsData = res.data.meals || res.data; // ✅ Handle paginated response
+        const mealsData = res.data.meals || res.data;
         const foundMeal = mealsData.find((m) => m._id === id);
         setMeal(foundMeal);
       } catch (err) {
@@ -28,7 +30,13 @@ const OrderPage = () => {
     fetchMeal();
   }, [id]);
 
-  if (!meal) return <div className="text-center mt-10">Loading...</div>;
+  if (!meal) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
+  }
 
   const handleOrder = async (e) => {
     e.preventDefault();
@@ -78,7 +86,7 @@ const OrderPage = () => {
         };
 
         try {
-          const res = await axiosPublic.post("/orders", orderData);
+          const res = await axiosSecure.post("/orders", orderData);
           if (res.data.insertedId) {
             Swal.fire("Success", "Order placed successfully!", "success");
           }
@@ -91,68 +99,100 @@ const OrderPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-start p-6 bg-base-200">
+    <div className="min-h-screen flex justify-center items-center p-6">
       <Helmet>
         <title>Place Order | LocalChefBazaar</title>
       </Helmet>
 
-      <div className="w-full max-w-md bg-base-100 shadow-lg rounded-lg p-6">
-        <h2 className="text-2xl font-bold mb-4 text-center">
+      <div className="w-full max-w-md bg-white shadow-2xl rounded-lg p-8">
+        <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
           Confirm Your Order
         </h2>
 
         <form onSubmit={handleOrder} className="flex flex-col gap-4">
-          <label>Meal Name</label>
-          <input
-            type="text"
-            value={meal.foodName}
-            readOnly
-            className="input input-bordered"
-          />
+          <div>
+            <label className="block text-sm font-semibold mb-2 text-gray-700">
+              Meal Name
+            </label>
+            <input
+              type="text"
+              value={meal.foodName}
+              readOnly
+              className="input w-full bg-gray-100 px-4 py-2 rounded"
+            />
+          </div>
 
-          <label>Price per Meal ($)</label>
-          <input
-            type="text"
-            value={meal.price}
-            readOnly
-            className="input input-bordered"
-          />
+          <div>
+            <label className="block text-sm font-semibold mb-2 text-gray-700">
+              Price per Meal ($)
+            </label>
+            <input
+              type="text"
+              value={meal.price}
+              readOnly
+              className="input w-full bg-gray-100 px-4 py-2 rounded"
+            />
+          </div>
 
-          <label>Quantity</label>
-          <input
-            type="number"
-            min="1"
-            value={quantity}
-            onChange={(e) => setQuantity(Number(e.target.value))}
-            className="input input-bordered"
-            required
-          />
+          <div>
+            <label className="block text-sm font-semibold mb-2 text-gray-700">
+              Quantity
+            </label>
+            <input
+              type="number"
+              min="1"
+              value={quantity}
+              onChange={(e) => setQuantity(Number(e.target.value))}
+              className="input w-full bg-white px-4 py-2 rounded border border-gray-300 focus:border-blue-500 focus:outline-none"
+              required
+            />
+          </div>
 
-          <label>Chef ID</label>
-          <input
-            type="text"
-            value={meal.chefId}
-            readOnly
-            className="input input-bordered"
-          />
+          <div>
+            <label className="block text-sm font-semibold mb-2 text-gray-700">
+              Chef ID
+            </label>
+            <input
+              type="text"
+              value={meal.chefId}
+              readOnly
+              className="input w-full bg-gray-100 px-4 py-2 rounded"
+            />
+          </div>
 
-          <label>User Email</label>
-          <input
-            type="email"
-            value={user.email}
-            readOnly
-            className="input input-bordered"
-          />
+          <div>
+            <label className="block text-sm font-semibold mb-2 text-gray-700">
+              Your Email
+            </label>
+            <input
+              type="email"
+              value={user.email}
+              readOnly
+              className="input w-full bg-gray-100 px-4 py-2 rounded"
+            />
+          </div>
 
-          <label>Delivery Address</label>
-          <textarea
-            value={userAddress}
-            onChange={(e) => setUserAddress(e.target.value)}
-            className="textarea textarea-bordered"
-            required
-          />
+          <div>
+            <label className="block text-sm font-semibold mb-2 text-gray-700">
+              Delivery Address
+            </label>
+            <textarea
+              value={userAddress}
+              onChange={(e) => setUserAddress(e.target.value)}
+              className="textarea w-full bg-white px-4 py-2 rounded border border-gray-300 focus:border-blue-500 focus:outline-none"
+              rows="3"
+              placeholder="Enter your delivery address..."
+              required
+            />
+          </div>
 
-          <button type="submit" className="btn btn-primary mt-4">
+          <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+            <p className="text-lg font-bold text-gray-800">
+              Total Price: ${(meal.price * quantity).toFixed(2)}
+            </p>
+          </div>
+
+          <button type="submit" className="btn btn-primary w-full mt-4 text-lg">
             Confirm Order
           </button>
         </form>

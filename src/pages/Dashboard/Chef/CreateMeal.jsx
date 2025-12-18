@@ -1,11 +1,13 @@
 import React, { useState } from "react";
+import { Helmet } from "react-helmet-async";
 import useAuth from "../../../hooks/useAuth";
-import axiosPublic from "../../../hooks/useAxiosPublic";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import Swal from "sweetalert2";
 import { imageUpload } from "../../../utilities";
 
 const CreateMeal = () => {
   const { user } = useAuth();
+  const axiosSecure = useAxiosSecure();
   const [meal, setMeal] = useState({
     foodName: "",
     price: "",
@@ -31,8 +33,9 @@ const CreateMeal = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Check if chef is fraud
     try {
-      const userRes = await axiosPublic.get(`/users?email=${user.email}`);
+      const userRes = await axiosSecure.get(`/users?email=${user.email}`);
       if (userRes.data[0]?.status === "fraud") {
         Swal.fire(
           "Error",
@@ -42,6 +45,7 @@ const CreateMeal = () => {
         return;
       }
 
+      // Get the chef's actual chefId from database
       const currentChef = userRes.data[0];
 
       if (!currentChef?.chefId) {
@@ -60,6 +64,7 @@ const CreateMeal = () => {
 
       setUploading(true);
 
+      // Upload image to ImgBB
       const imageURL = await imageUpload(imageFile);
 
       const mealData = {
@@ -70,7 +75,7 @@ const CreateMeal = () => {
         rating: 0,
       };
 
-      const res = await axiosPublic.post("/meals", mealData);
+      const res = await axiosSecure.post("/meals", mealData);
       if (res.data.insertedId) {
         Swal.fire("Success", "Meal created successfully!", "success");
         setMeal({
@@ -82,7 +87,6 @@ const CreateMeal = () => {
           chefExperience: "",
         });
         setImageFile(null);
-
         document.getElementById("imageInput").value = "";
       }
     } catch (err) {
@@ -95,6 +99,10 @@ const CreateMeal = () => {
 
   return (
     <div className="p-6">
+      <Helmet>
+        <title>Create Meal | Chef Dashboard</title>
+      </Helmet>
+
       <h2 className="text-2xl font-bold mb-4">Create New Meal</h2>
       <form
         onSubmit={handleSubmit}

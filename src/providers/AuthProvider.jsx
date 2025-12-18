@@ -21,6 +21,7 @@ const AuthProvider = ({ children }) => {
     setLoading(true);
     return createUserWithEmailAndPassword(auth, email, password);
   };
+
   const singInUser = (email, password) => {
     setLoading(true);
     return signInWithEmailAndPassword(auth, email, password);
@@ -35,6 +36,7 @@ const AuthProvider = ({ children }) => {
     setLoading(true);
     return signOut(auth);
   };
+
   const updateUser = (profile) => {
     return updateProfile(auth.currentUser, profile);
   };
@@ -43,12 +45,14 @@ const AuthProvider = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setLoading(false);
-      console.log(currentUser);
+      console.log("Firebase Auth User:", currentUser);
     });
+
     return () => {
       unsubscribe();
     };
   }, []);
+
   const authInfo = {
     registerUser,
     singInUser,
@@ -60,6 +64,7 @@ const AuthProvider = ({ children }) => {
     logOut,
     updateUser,
   };
+
   return (
     <AuthContext.Provider value={authInfo}>{children}</AuthContext.Provider>
   );

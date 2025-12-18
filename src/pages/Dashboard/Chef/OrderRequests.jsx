@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import useAuth from "../../../hooks/useAuth";
-import axiosPublic from "../../../hooks/useAxiosPublic";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import Swal from "sweetalert2";
 
 const OrderRequests = () => {
   const { user } = useAuth();
+  const axiosSecure = useAxiosSecure();
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
@@ -13,7 +15,8 @@ const OrderRequests = () => {
 
   const fetchOrders = async () => {
     try {
-      const userRes = await axiosPublic.get(`/users?email=${user.email}`);
+      // Get chef's actual chefId
+      const userRes = await axiosSecure.get(`/users?email=${user.email}`);
       const currentChef = userRes.data[0];
 
       if (!currentChef?.chefId) {
@@ -21,7 +24,7 @@ const OrderRequests = () => {
         return;
       }
 
-      const res = await axiosPublic.get("/orders");
+      const res = await axiosSecure.get("/orders");
       const chefOrders = res.data.filter(
         (o) => o.chefId === currentChef.chefId
       );
@@ -33,7 +36,7 @@ const OrderRequests = () => {
 
   const handleStatusUpdate = async (id, newStatus) => {
     try {
-      const res = await axiosPublic.patch(`/orders/${id}`, {
+      const res = await axiosSecure.patch(`/orders/${id}`, {
         orderStatus: newStatus,
       });
 
@@ -53,6 +56,10 @@ const OrderRequests = () => {
 
   return (
     <div className="p-6">
+      <Helmet>
+        <title>Order Requests | Chef Dashboard</title>
+      </Helmet>
+
       <h2 className="text-2xl font-bold mb-4">Order Requests</h2>
       <div className="space-y-4">
         {orders.length > 0 ? (

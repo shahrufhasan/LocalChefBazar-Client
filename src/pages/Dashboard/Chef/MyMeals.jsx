@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import useAuth from "../../../hooks/useAuth";
-import axiosPublic from "../../../hooks/useAxiosPublic";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import Swal from "sweetalert2";
 import { imageUpload } from "../../../utilities";
 
 const MyMeals = () => {
   const { user } = useAuth();
+  const axiosSecure = useAxiosSecure();
   const [meals, setMeals] = useState([]);
   const [editingMeal, setEditingMeal] = useState(null);
   const [updateData, setUpdateData] = useState({});
@@ -18,7 +20,8 @@ const MyMeals = () => {
 
   const fetchMeals = async () => {
     try {
-      const userRes = await axiosPublic.get(`/users?email=${user.email}`);
+      // First get current user's chefId from database
+      const userRes = await axiosSecure.get(`/users?email=${user.email}`);
       const currentChef = userRes.data[0];
 
       if (!currentChef?.chefId) {
@@ -26,9 +29,11 @@ const MyMeals = () => {
         return;
       }
 
-      const res = await axiosPublic.get("/meals?limit=1000");
+      // Fetch all meals
+      const res = await axiosSecure.get("/meals?limit=1000");
       const mealsData = res.data.meals || res.data;
 
+      // Filter by the chef's actual chefId from database
       const chefMeals = mealsData.filter(
         (m) => m.chefId === currentChef.chefId
       );
@@ -50,7 +55,7 @@ const MyMeals = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosPublic.delete(`/meals/${id}`);
+          const res = await axiosSecure.delete(`/meals/${id}`);
           if (res.data.deletedCount > 0) {
             Swal.fire("Deleted!", "Meal has been deleted.", "success");
             fetchMeals();
@@ -81,7 +86,7 @@ const MyMeals = () => {
         finalData.foodImage = imageURL;
       }
 
-      const res = await axiosPublic.patch(`/meals/${id}`, finalData);
+      const res = await axiosSecure.patch(`/meals/${id}`, finalData);
       if (res.data.modifiedCount > 0) {
         Swal.fire("Updated!", "Meal has been updated.", "success");
         setEditingMeal(null);
@@ -109,6 +114,10 @@ const MyMeals = () => {
 
   return (
     <div className="p-6">
+      <Helmet>
+        <title>My Meals | Chef Dashboard</title>
+      </Helmet>
+
       <h2 className="text-2xl font-bold mb-4">My Meals</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {meals.length > 0 ? (

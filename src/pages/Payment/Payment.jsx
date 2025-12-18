@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { Helmet } from "react-helmet-async";
-import axiosPublic from "../../hooks/useAxiosPublic";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 import useAuth from "../../hooks/useAuth";
 import CheckoutForm from "./CheckoutForm";
 import Swal from "sweetalert2";
@@ -13,6 +13,7 @@ const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 const Payment = () => {
   const { orderId } = useParams();
   const { user } = useAuth();
+  const axiosSecure = useAxiosSecure();
   const navigate = useNavigate();
   const [clientSecret, setClientSecret] = useState("");
   const [order, setOrder] = useState(null);
@@ -25,7 +26,7 @@ const Payment = () => {
   const fetchOrderAndCreateIntent = async () => {
     try {
       // Fetch order details
-      const ordersRes = await axiosPublic.get("/orders");
+      const ordersRes = await axiosSecure.get("/orders");
       const foundOrder = ordersRes.data.find((o) => o._id === orderId);
 
       if (!foundOrder) {
@@ -39,7 +40,7 @@ const Payment = () => {
       const totalAmount = foundOrder.price * foundOrder.quantity;
 
       // Create payment intent
-      const paymentRes = await axiosPublic.post("/create-payment-intent", {
+      const paymentRes = await axiosSecure.post("/create-payment-intent", {
         amount: totalAmount,
       });
 
@@ -66,10 +67,10 @@ const Payment = () => {
         paymentTime: new Date().toISOString(),
       };
 
-      await axiosPublic.post("/payment-history", paymentData);
+      await axiosSecure.post("/payment-history", paymentData);
 
       // Update order payment status
-      await axiosPublic.patch(`/orders/${order._id}/payment`, {
+      await axiosSecure.patch(`/orders/${order._id}/payment`, {
         paymentStatus: "Paid",
       });
 

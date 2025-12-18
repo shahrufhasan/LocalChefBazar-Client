@@ -1,7 +1,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useLocation, Link } from "react-router";
-
 import useAuth from "../../../hooks/useAuth";
 import { ImSpinner3 } from "react-icons/im";
 import Swal from "sweetalert2";
@@ -10,7 +9,7 @@ const Login = () => {
   const { singInUser, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state || "/";
+  const from = location.state?.from || "/";
 
   const {
     register,
@@ -21,7 +20,12 @@ const Login = () => {
   const onSubmit = async (data) => {
     try {
       const { email, password } = data;
-      await singInUser(email, password);
+      const result = await singInUser(email, password);
+
+      // ✅ Get Firebase ID Token immediately after login
+      const token = await result.user.getIdToken();
+      console.log("Firebase Token obtained:", token ? "Yes" : "No");
+
       Swal.fire({
         position: "top-end",
         icon: "success",
@@ -29,13 +33,15 @@ const Login = () => {
         showConfirmButton: false,
         timer: 1500,
       });
+
       navigate(from, { replace: true });
     } catch (err) {
       console.log(err);
       Swal.fire({
         position: "top-end",
-        icon: "success",
-        title: "Error login",
+        icon: "error",
+        title: "Login Failed",
+        text: err.message || "Invalid email or password",
         showConfirmButton: false,
         timer: 1500,
       });
@@ -99,6 +105,7 @@ const Login = () => {
           <button
             type="submit"
             className="w-full bg-primary text-base-100 py-3 rounded-lg hover:bg-secondary transition-colors flex justify-center items-center"
+            disabled={loading}
           >
             {loading ? <ImSpinner3 className="animate-spin" /> : "Login"}
           </button>

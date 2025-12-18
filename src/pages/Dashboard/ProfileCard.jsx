@@ -1,34 +1,34 @@
 import React, { useEffect, useState } from "react";
 import useAuth from "../../hooks/useAuth";
-import axiosPublic from "../../hooks/useAxiosPublic";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 import Swal from "sweetalert2";
 
 const ProfileCard = () => {
-  const { user, setUser } = useAuth();
-  const [currentUser, setCurrentUser] = useState(user);
+  const { user } = useAuth();
+  const axiosSecure = useAxiosSecure();
+  const [currentUser, setCurrentUser] = useState(null);
 
-  // Fetch fresh user info from DB
+  // Fetch user info from DB
   useEffect(() => {
     const fetchUser = async () => {
       if (!user?.email) return;
       try {
-        const res = await axiosPublic.get(`/users?email=${user.email}`);
+        const res = await axiosSecure.get(`/users?email=${user.email}`);
         if (res.data && res.data.length > 0) {
           setCurrentUser(res.data[0]);
-          setUser(res.data[0]); // ✅ update global auth context
         }
       } catch (err) {
         console.error(err);
       }
     };
     fetchUser();
-  }, [user, setUser]);
+  }, [user, axiosSecure]);
 
   if (!currentUser) return <div>Loading...</div>;
 
   const sendRequest = async (type) => {
     const requestData = {
-      userName: currentUser.displayName,
+      userName: currentUser.name || user.displayName,
       userEmail: currentUser.email,
       requestType: type,
       requestStatus: "pending",
@@ -36,7 +36,7 @@ const ProfileCard = () => {
     };
 
     try {
-      const res = await axiosPublic.post("/requests", requestData);
+      const res = await axiosSecure.post("/requests", requestData);
       if (res.data.insertedId) {
         Swal.fire(
           "Success",
@@ -54,13 +54,15 @@ const ProfileCard = () => {
     <div className="p-6 max-w-md mx-auto bg-base-100 shadow rounded-lg">
       <div className="flex flex-col items-center gap-4">
         <img
-          src={currentUser.photoURL}
-          alt={currentUser.displayName}
+          src={user.photoURL}
+          alt={user.displayName}
           className="w-24 h-24 rounded-full"
         />
-        <h2 className="text-xl font-bold">{currentUser.displayName}</h2>
+        <h2 className="text-xl font-bold">
+          {currentUser.name || user.displayName}
+        </h2>
         <p>
-          <strong>Email:</strong> {currentUser.email}
+          <strong>Email:</strong> {user.email}
         </p>
         <p>
           <strong>Address:</strong> {currentUser.address}

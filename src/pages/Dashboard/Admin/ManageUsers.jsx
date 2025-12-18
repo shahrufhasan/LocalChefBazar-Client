@@ -1,8 +1,11 @@
 import Swal from "sweetalert2";
+import { Helmet } from "react-helmet-async";
 import { useQuery } from "@tanstack/react-query";
-import axiosPublic from "../../../hooks/useAxiosPublic";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 
 const ManageUsers = () => {
+  const axiosSecure = useAxiosSecure();
+
   const {
     data: users = [],
     isLoading,
@@ -10,7 +13,7 @@ const ManageUsers = () => {
   } = useQuery({
     queryKey: ["users"],
     queryFn: async () => {
-      const res = await axiosPublic.get("/users");
+      const res = await axiosSecure.get("/users");
       return res.data;
     },
   });
@@ -29,7 +32,7 @@ const ManageUsers = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axiosPublic.patch(`/users/${email}/status`, {
+          await axiosSecure.patch(`/users/${email}/status`, {
             status: "fraud",
           });
 
@@ -44,6 +47,10 @@ const ManageUsers = () => {
 
   return (
     <div className="p-6">
+      <Helmet>
+        <title>Manage Users | Admin Dashboard</title>
+      </Helmet>
+
       <h2 className="text-2xl font-bold mb-4">Manage Users</h2>
 
       <div className="overflow-x-auto">
