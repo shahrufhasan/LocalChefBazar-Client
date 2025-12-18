@@ -5,12 +5,12 @@ import Footer from "../components/Shared/Footer/Footer";
 
 const RootLayout = () => {
   return (
-    <div>
+    <div className="min-h-screen flex flex-col">
       <Navbar></Navbar>
-      <div className="h-screen max-w-7xl mx-auto">
+      <div className="flex-1 max-w-7xl mx-auto">
         <Outlet></Outlet>
       </div>
-      <div className="mt-20"></div>
+      <Footer></Footer>
     </div>
   );
 };

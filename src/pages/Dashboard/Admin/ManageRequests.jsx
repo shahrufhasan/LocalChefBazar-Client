@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import axiosPublic from "../../../hooks/useAxiosPublic";
 import Swal from "sweetalert2";
 
 const ManageRequests = () => {
+  const axiosSecure = useAxiosSecure();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -37,7 +40,8 @@ const ManageRequests = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosPublic.patch(`/requests/${id}`, {
+          // ✅ Use axiosSecure for PATCH request
+          const res = await axiosSecure.patch(`/requests/${id}`, {
             requestStatus: status,
           });
 
@@ -73,6 +77,10 @@ const ManageRequests = () => {
 
   return (
     <div className="p-6">
+      <Helmet>
+        <title>Manage Requests | Admin Dashboard</title>
+      </Helmet>
+
       <h2 className="text-2xl font-bold mb-4">Manage User Requests</h2>
 
       {requests.length === 0 ? (

@@ -18,7 +18,7 @@ const CustomerReviews = () => {
   }, []);
 
   return (
-    <div className="py-16 bg-base-200">
+    <div className="py-16">
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold">What Our Customers Say</h2>

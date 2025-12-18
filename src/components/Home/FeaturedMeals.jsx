@@ -12,7 +12,6 @@ const FeaturedMeals = () => {
     const fetchMeals = async () => {
       try {
         const res = await axiosPublic.get("/meals?page=1&limit=6");
-        // Get only first 6 meals
         setMeals(res.data.meals || res.data.slice(0, 6));
       } catch (err) {
         console.error(err);
@@ -27,9 +26,9 @@ const FeaturedMeals = () => {
 
   return (
     <div className="py-16">
-      <div className="text-center mb-8">
+      <div className="text-center mb-12">
         <h2 className="text-4xl font-bold">Today's Special Meals</h2>
-        <p className="text-gray-500 mt-2">
+        <p className="text-gray-500">
           Fresh home-cooked meals from local chefs
         </p>
       </div>

@@ -98,6 +98,14 @@ const MealDetails = () => {
       if (res.data.insertedId) {
         setReviews([...reviews, reviewData]);
         setNewReview({ rating: "", comment: "" });
+
+        if (res.data.newRating) {
+          setMeal({
+            ...meal,
+            rating: parseFloat(res.data.newRating),
+          });
+        }
+
         Swal.fire("Success", "Review submitted successfully!", "success");
       }
     } catch (err) {
@@ -118,12 +126,12 @@ const MealDetails = () => {
   if (!meal) return <div className="text-center mt-10">Loading...</div>;
 
   return (
-    <div className="min-h-screen flex justify-center items-start p-6 bg-base-200">
+    <div className="min-h-screen flex justify-center items-center py-16 px-4 bg-base-200">
       <Helmet>
         <title>{meal.foodName} | LocalChefBazaar</title>
       </Helmet>
 
-      <div className="w-full max-w-4xl bg-base-100 shadow-lg rounded-lg p-6">
+      <div className="w-full max-w-5xl shadow-xl rounded-lg p-8 my-8">
         {/* Meal Info */}
         <div className="flex flex-col md:flex-row gap-6">
           <img
@@ -140,7 +148,7 @@ const MealDetails = () => {
               <strong>Price:</strong> ${meal.price}
             </p>
             <p>
-              <strong>Rating:</strong> {meal.rating} / 5
+              <strong>Rating:</strong> {meal.rating || 0} / 5
             </p>
             <p>
               <strong>Ingredients:</strong> {meal.ingredients}
@@ -174,7 +182,7 @@ const MealDetails = () => {
               reviews.map((r, idx) => (
                 <div
                   key={idx}
-                  className="border rounded-lg p-4 flex gap-4 items-start"
+                  className="bg-base-200 rounded-lg p-4 flex gap-4 items-start"
                 >
                   <img
                     src={r.reviewerImage}
@@ -198,32 +206,42 @@ const MealDetails = () => {
           </div>
 
           {/* Add Review Form */}
-          <form onSubmit={handleReviewSubmit} className="flex flex-col gap-2">
-            <label className="font-semibold">Your Rating (1-5)</label>
-            <input
-              type="number"
-              min="1"
-              max="5"
-              value={newReview.rating}
-              onChange={(e) =>
-                setNewReview({ ...newReview, rating: e.target.value })
-              }
-              className="input input-bordered w-32"
-              required
-            />
+          <form onSubmit={handleReviewSubmit} className="flex flex-col gap-4">
+            <div className="flex flex-col md:flex-row justify-between gap-4">
+              {/* Rating Input */}
+              <div className="flex-1">
+                <label className="font-semibold block mb-2">
+                  Your Rating (1-5)
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="5"
+                  value={newReview.rating}
+                  onChange={(e) =>
+                    setNewReview({ ...newReview, rating: e.target.value })
+                  }
+                  className="input input-bordered w-full"
+                  required
+                />
+              </div>
 
-            <label className="font-semibold">Comment</label>
-            <textarea
-              value={newReview.comment}
-              onChange={(e) =>
-                setNewReview({ ...newReview, comment: e.target.value })
-              }
-              className="textarea textarea-bordered"
-              rows="3"
-              required
-            />
+              {/* Comment Input */}
+              <div className="flex-1">
+                <label className="font-semibold block mb-2">Comment</label>
+                <textarea
+                  value={newReview.comment}
+                  onChange={(e) =>
+                    setNewReview({ ...newReview, comment: e.target.value })
+                  }
+                  className="textarea textarea-bordered w-full"
+                  rows="3"
+                  required
+                />
+              </div>
+            </div>
 
-            <button type="submit" className="btn btn-primary mt-2 w-40">
+            <button type="submit" className="btn btn-primary w-full ">
               Give Review
             </button>
           </form>

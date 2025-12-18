@@ -6,10 +6,13 @@ import MealCard from "./MealCard";
 
 const Meals = () => {
   const [meals, setMeals] = useState([]);
+  const [allMeals, setAllMeals] = useState([]);
   const [sortOrder, setSortOrder] = useState("asc");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [ratingFilter, setRatingFilter] = useState("all");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,6 +24,7 @@ const Meals = () => {
       setLoading(true);
       const res = await axios.get(`/meals?page=${currentPage}&limit=10`);
       setMeals(res.data.meals);
+      setAllMeals(res.data.meals);
       setTotalPages(res.data.totalPages);
     } catch (err) {
       console.error("Error fetching meals:", err);
@@ -37,12 +41,37 @@ const Meals = () => {
     setSortOrder(sortOrder === "asc" ? "desc" : "asc");
   };
 
+  const handleSearch = (e) => {
+    const term = e.target.value.toLowerCase();
+    setSearchTerm(term);
+    filterMeals(term, ratingFilter);
+  };
+
+  const filterMeals = (search, rating) => {
+    let filtered = [...allMeals];
+
+    if (search) {
+      filtered = filtered.filter((meal) =>
+        meal.foodName.toLowerCase().includes(search)
+      );
+    }
+
+    if (rating !== "all") {
+      const minRating = parseFloat(rating);
+      filtered = filtered.filter((meal) => meal.rating >= minRating);
+    }
+
+    setMeals(filtered);
+  };
+
   const handleSeeDetails = (mealId) => {
     navigate(`/meal-details/${mealId}`);
   };
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
+    setSearchTerm("");
+    setRatingFilter("all");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -55,27 +84,69 @@ const Meals = () => {
   }
 
   return (
-    <div className="min-h-screen my-16 py-16">
+    <div className="min-h-screen my-16 py-16 px-6">
       <Helmet>
         <title>Meals | LocalChefBazaar</title>
       </Helmet>
 
-      <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-        <h1 className="text-3xl font-bold">Daily Meals</h1>
-        <button onClick={handleSort} className="btn btn-secondary">
+      {/* Header Section */}
+      <div className="text-center space-y-3 mb-12">
+        <h1 className="text-6xl font-bold">Explore Our Daily Meals</h1>
+        <p className="text-gray-500 text-2xl">
+          Fresh, homemade dishes crafted by local chefs just for you
+        </p>
+      </div>
+
+      {/* Search and Filter  */}
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+        {/* Search Bar */}
+        <div className="w-full md:w-1/3">
+          <input
+            type="text"
+            placeholder="Search meals..."
+            value={searchTerm}
+            onChange={handleSearch}
+            className="input input-bordered w-full"
+          />
+        </div>
+
+        {/* Sort by Price */}
+        <button
+          onClick={handleSort}
+          className="btn btn-secondary w-full md:w-auto"
+        >
           Sort by Price ({sortOrder === "asc" ? "Low → High" : "High → Low"})
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {meals.map((meal) => (
-          <MealCard
-            key={meal._id}
-            meal={meal}
-            onSeeDetails={handleSeeDetails}
-          />
-        ))}
-      </div>
+      {/* Meals Grid */}
+      {meals.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {meals.map((meal) => (
+            <MealCard
+              key={meal._id}
+              meal={meal}
+              onSeeDetails={handleSeeDetails}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-20">
+          <p className="text-gray-500 text-lg">
+            No meals found matching your criteria.
+          </p>
+          <button
+            className="btn btn-primary mt-4"
+            onClick={() => {
+              setSearchTerm("");
+              setRatingFilter("all");
+              setMeals(allMeals);
+            }}
+          >
+            Clear Filters
+          </button>
+        </div>
+      )}
 
       {/* Pagination Controls */}
       {totalPages > 1 && (
@@ -117,7 +188,7 @@ const Meals = () => {
 
       {/* Show current page info */}
       <div className="text-center mt-4 text-sm text-gray-600">
-        Page {currentPage} of {totalPages}
+        Showing {meals.length} meals - Page {currentPage} of {totalPages}
       </div>
     </div>
   );
