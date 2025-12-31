@@ -2,8 +2,6 @@
 
 LocalChefBazaar is a **full-stack MERN marketplace platform** that connects **local home chefs** with customers looking for **fresh, homemade meals**. The platform supports **real-time ordering**, **secure payments**, **role-based dashboards**, and a smooth user experience for Admins, Chefs, and Customers.
 
-This project was built as part of **B12-A11 Category-15** evaluation to demonstrate real-world application development skills using modern technologies.
-
 ---
 
 ## 🚀 Live Links
