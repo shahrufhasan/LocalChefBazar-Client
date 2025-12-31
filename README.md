@@ -2,7 +2,7 @@
 
 A full-stack MERN marketplace platform connecting local home chefs with customers looking for fresh, homemade meals.
 
-![LocalChefBazar Screenshot](https://i.ibb.co/placeholder/localchefbazar-screenshot.png)
+![LocalChefBazar Screenshot](https://i.ibb.co/8Df83wbc/Screenshot-2025-12-31-at-12-47-30-AM.png)
 
 ---
 
@@ -171,61 +171,19 @@ http://localhost:5173
 
 ---
 
-## 🗂️ Project Structure
-```
-LocalChefBazar-Client/
-├── public/
-│   └── ...
-├── src/
-│   ├── components/
-│   │   ├── Navbar.jsx
-│   │   ├── Footer.jsx
-│   │   ├── MealCard.jsx
-│   │   └── ...
-│   ├── pages/
-│   │   ├── Home/
-│   │   ├── Meals/
-│   │   ├── Dashboard/
-│   │   │   ├── Admin/
-│   │   │   ├── Chef/
-│   │   │   └── User/
-│   │   └── ...
-│   ├── hooks/
-│   │   ├── useAuth.js
-│   │   ├── useAxiosSecure.js
-│   │   └── ...
-│   ├── context/
-│   │   └── AuthContext.jsx
-│   ├── routes/
-│   │   ├── PrivateRoute.jsx
-│   │   ├── AdminRoute.jsx
-│   │   └── ChefRoute.jsx
-│   ├── firebase/
-│   │   └── firebase.config.js
-│   ├── App.jsx
-│   └── main.jsx
-├── .env.local
-├── firebase.json
-├── package.json
-├── vite.config.js
-└── README.md
-```
-
----
-
 ## 📸 Screenshots
 
 ### Home Page
-![Home Page](https://i.ibb.co/placeholder/home.png)
+![Home Page](https://i.ibb.co/8Df83wbc/Screenshot-2025-12-31-at-12-47-30-AM.png)
 
-### Meals Page
-![Meals Page](https://i.ibb.co/placeholder/meals.png)
+### All Meals Page
+![All Meals](https://i.ibb.co/23JkSg4K/Screenshot-2025-12-31-at-12-49-45-AM.png)
 
-### Admin Dashboard
-![Admin Dashboard](https://i.ibb.co/placeholder/admin.png)
+### Meal Details Page
+![Meal Details](https://i.ibb.co/hxDt1JGd/Screenshot-2025-12-31-at-12-50-51-AM.png)
 
-### Chef Dashboard
-![Chef Dashboard](https://i.ibb.co/placeholder/chef.png)
+### Dashboard
+![Dashboard](https://i.ibb.co/LDHd7Y75/Screenshot-2025-12-31-at-12-51-31-AM.png)
 
 ---
 
